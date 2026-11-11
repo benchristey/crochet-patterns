@@ -1,0 +1,938 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Edwin">
+<title>Edwin the Frog</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: pond-green workbench. Sticky tab bar; Make view = big tracker card + side column (frog figure, step list). */
+:root{
+  --bg:#EDF3E4; --surface:#FFFFFF; --surface-2:#F5F8EF; --ink:#1F2E18; --muted:#58684F; --line:#D2DEC5;
+  --leaf:#4F8C22; --leaf-ink:#FFFFFF; --leaf-soft:#DDEBC9; --glow:#FFBE2E; --marker:#EE7A2B;
+  --c-rnd:#DE564B; --c-st:#2FA48A; --c-x:#E3A21F; --c-tot:#5A80D0;
+  --metal:#B4BDC6; --metal-dark:#6A7682; --grip:#F2B233; --skin:#EFC6A2; --outline:rgba(31,46,24,.5);
+  --hole:#3a2f25;
+  --font-d:'Fredoka','Nunito',ui-rounded,system-ui,sans-serif;
+  --font-b:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --r:18px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10170E; --surface:#1A2416; --surface-2:#212D1C; --ink:#E7F0DE; --muted:#A1B396; --line:#33442C;
+  --leaf:#8CC65A; --leaf-ink:#11200B; --leaf-soft:#2B3C21; --glow:#FFCB52; --outline:rgba(0,0,0,.6); --hole:#0c0906; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10170E; --surface:#1A2416; --surface-2:#212D1C; --ink:#E7F0DE; --muted:#A1B396; --line:#33442C;
+  --leaf:#8CC65A; --leaf-ink:#11200B; --leaf-soft:#2B3C21; --glow:#FFCB52; --outline:rgba(0,0,0,.6); --hole:#0c0906; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:17px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+h1,h2,h3{font-family:var(--font-d);font-weight:600;line-height:1.15;text-wrap:balance;margin:0}
+p{margin:0}
+a{color:var(--leaf)}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:3px solid var(--glow);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-block:12px}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.brand h1{font-size:26px}
+.brand small{display:block;font-size:13px;color:var(--muted);font-family:var(--font-b);font-weight:600}
+nav.tabs{display:flex;gap:6px;flex-wrap:wrap}
+nav.tabs button{border:0;background:transparent;padding:10px 16px;border-radius:999px;font-weight:800;font-size:16px;color:var(--muted)}
+nav.tabs button[aria-selected="true"]{background:var(--leaf);color:var(--leaf-ink)}
+main{padding-block:20px 60px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.eyebrow{font-size:13px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--muted)}
+.btn{border:2px solid var(--line);background:var(--surface);border-radius:14px;padding:12px 18px;font-weight:800;display:inline-flex;align-items:center;gap:8px;min-height:52px;text-decoration:none;color:var(--ink)}
+.btn.primary{background:var(--leaf);border-color:var(--leaf);color:var(--leaf-ink)}
+.btn.big{font-size:22px;min-height:76px;padding:14px 30px;border-radius:20px;font-family:var(--font-d);font-weight:600}
+.btn.small{min-height:40px;padding:6px 12px;font-size:15px}
+.btn svg{flex:none}
+.btn:active{transform:translateY(1px)}
+
+/* pattern code chips, same colours as the booklet */
+.code{display:inline-flex;flex-wrap:wrap;border-radius:8px;overflow:hidden;font-family:ui-monospace,Menlo,monospace;font-weight:700;font-size:18px;color:#fff}
+.code span{padding:4px 10px}
+.c-rnd{background:var(--c-rnd)}.c-st{background:var(--c-st)}.c-x{background:var(--c-x)}.c-tot{background:var(--c-tot)}
+
+/* parts strip */
+.parts{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;margin-bottom:16px}
+.part{flex:none;display:flex;align-items:center;gap:10px;border:2px solid var(--line);background:var(--surface);border-radius:16px;padding:8px 14px 8px 8px;min-width:150px;text-align:left}
+.part[aria-current="true"]{border-color:var(--leaf);box-shadow:0 0 0 3px var(--leaf-soft)}
+.part .sw{width:34px;height:34px;border-radius:50%;flex:none;border:2px solid var(--outline)}
+.part b{display:block;font-size:15px}
+.part .bar{height:6px;border-radius:3px;background:var(--line);margin-top:4px;overflow:hidden}
+.part .bar i{display:block;height:100%;background:var(--leaf)}
+.part.done .bar i{background:var(--c-st)}
+
+.make-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
+@media (max-width:900px){.make-grid{grid-template-columns:1fr}}
+.work{padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.work-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.work-head h2{font-size:30px}
+.tracker{display:flex;justify-content:center}
+.tracker svg{width:100%;max-width:440px;height:auto;touch-action:manipulation}
+.instr{display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:var(--surface-2);border-radius:16px;padding:14px 16px}
+.instr .txt{flex:1;min-width:220px}
+.instr .main{font-size:21px;font-weight:700}
+.instr .sub{color:var(--muted);font-weight:600}
+.badge{display:inline-block;font-family:ui-monospace,Menlo,monospace;font-weight:800;background:var(--c-st);color:#fff;border-radius:8px;padding:2px 10px;margin-right:6px}
+.note{border-left:6px solid var(--marker);background:var(--surface-2);border-radius:10px;padding:10px 14px;font-weight:700}
+.ctrl{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap}
+.tally{text-align:center;font-weight:800;font-size:18px;font-variant-numeric:tabular-nums}
+.tally .n{font-family:var(--font-d);font-size:26px;color:var(--leaf)}
+.complete{text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center;padding:8px}
+.complete h3{font-size:28px}
+.task{display:flex;flex-direction:column;gap:14px}
+.task p{font-size:19px;max-width:60ch}
+.task .grown{display:flex;gap:10px;align-items:center;background:#FFF1D6;color:#5a3d00;border-radius:12px;padding:10px 14px;font-weight:800}
+:root[data-theme="dark"] .task .grown{background:#3b2e12;color:#ffe1a3}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .task .grown{background:#3b2e12;color:#ffe1a3}}
+.row-actions{display:flex;gap:10px;flex-wrap:wrap}
+
+.side{display:flex;flex-direction:column;gap:18px;min-width:0}
+.fig{padding:14px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.fig svg{width:100%;max-width:280px;height:auto}
+.fig .cap{font-size:14px;color:var(--muted);font-weight:700;text-align:center}
+.steps{padding:14px}
+.steps h3{font-size:18px;margin-bottom:8px}
+.steps ol{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px;max-height:340px;overflow:auto}
+.steps li button{border:2px solid var(--line);background:var(--surface);border-radius:10px;padding:4px 10px;font-weight:800;font-size:14px;min-height:38px;display:flex;align-items:center;gap:6px}
+.steps li button.done{background:var(--leaf-soft);border-color:transparent}
+.steps li button[aria-current="true"]{border-color:var(--glow);box-shadow:0 0 0 2px var(--glow)}
+.steps li button .dot{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.steps li button.done .dot{background:var(--leaf)}
+
+/* stitch player */
+.player{display:flex;flex-direction:column;gap:12px}
+.stage{background:var(--surface-2);border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+.stage svg{display:block;width:100%;height:auto}
+.stage .hk{transition:transform .8s cubic-bezier(.4,.1,.2,1)}
+.stage .scale{transition:transform 1s ease}
+.pl-cap{display:flex;flex-direction:column;gap:6px;min-height:92px}
+.pl-step{font-weight:800;color:var(--muted);font-size:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pl-text{font-size:20px;font-weight:700}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--leaf-soft);border-radius:999px;padding:2px 10px;font-size:14px;font-weight:800;color:var(--ink)}
+.pl-ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.dots{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.dots button{width:14px;height:14px;border-radius:50%;border:0;background:var(--line);padding:0}
+.dots button.on{background:var(--leaf)}
+.steplist{margin:0;padding-left:0;list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:10px}
+.steplist li{counter-increment:s;display:flex;gap:12px;align-items:flex-start;font-size:19px}
+.steplist li::before{content:counter(s);flex:none;width:36px;height:36px;border-radius:50%;background:var(--leaf);color:var(--leaf-ink);display:grid;place-items:center;font-family:var(--font-d);font-weight:600}
+
+/* stitch school */
+.school{display:grid;grid-template-columns:280px minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:820px){.school{grid-template-columns:1fr}}
+.st-list{display:flex;flex-direction:column;gap:8px;padding:12px}
+.st-list h3{font-size:15px;color:var(--muted);padding:6px 4px 0}
+.st-item{display:flex;align-items:center;gap:10px;border:2px solid transparent;background:var(--surface-2);border-radius:12px;padding:8px 12px;text-align:left;font-weight:800}
+.st-item[aria-current="true"]{border-color:var(--leaf);background:var(--leaf-soft)}
+.st-item small{display:block;font-weight:600;color:var(--muted);font-size:13px}
+.st-item .ab{font-family:ui-monospace,Menlo,monospace;background:var(--c-st);color:#fff;border-radius:6px;padding:0 7px;font-size:14px;min-width:44px;text-align:center}
+.st-item.ext .ab{background:var(--muted)}
+.st-main{padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.st-main h2{font-size:30px}
+.st-main .why{color:var(--muted);font-size:18px;max-width:62ch}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(10,20,8,.55);z-index:20;display:flex;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.modal{width:min(760px,100%);max-height:100%;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.modal-head h2{font-size:26px}
+
+/* pattern decoder */
+.dec-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.dec-grid{grid-template-columns:1fr}}
+.panel{padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel h2{font-size:28px}
+.picker{display:flex;gap:8px;flex-wrap:wrap}
+.picker button{border:2px solid var(--line);background:var(--surface);border-radius:10px;padding:6px 12px;font-weight:800;font-size:15px}
+.picker button[aria-pressed="true"]{border-color:var(--leaf);background:var(--leaf-soft)}
+.bigcode{display:flex;flex-wrap:wrap;gap:6px}
+.bigcode button{border:0;border-radius:12px;padding:10px 16px;font-family:ui-monospace,Menlo,monospace;font-size:26px;font-weight:800;color:#fff;transition:transform .15s}
+.bigcode button[aria-pressed="true"]{transform:translateY(-4px);box-shadow:0 6px 0 rgba(0,0,0,.2)}
+.explain{background:var(--surface-2);border-radius:14px;padding:14px 16px;font-size:19px;border-left:8px solid var(--c-st)}
+.explain b.h{display:block;font-family:var(--font-d);font-size:22px;font-weight:600;margin-bottom:2px}
+.groups{display:flex;flex-direction:column;gap:6px}
+.grp{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.grp .gn{font-weight:800;color:var(--muted);width:76px;font-size:14px}
+.tok{font-family:ui-monospace,Menlo,monospace;font-weight:800;border-radius:6px;padding:2px 8px;background:var(--surface-2);border:2px solid var(--line);font-size:15px}
+.tok.on{background:var(--glow);border-color:var(--glow);color:#3a2a00}
+.tok.done{background:var(--leaf-soft);border-color:transparent}
+.math{font-size:19px;font-weight:700;background:var(--surface-2);border-radius:12px;padding:12px 14px}
+.math .eq{font-family:ui-monospace,Menlo,monospace}
+.gloss{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.gloss div{display:flex;gap:10px;align-items:baseline;background:var(--surface-2);border-radius:10px;padding:10px 12px}
+.gloss b{font-family:ui-monospace,Menlo,monospace;font-size:17px;min-width:44px;color:var(--c-st)}
+
+/* kit */
+.kit{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.mat{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.mat div{background:var(--surface-2);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:4px}
+.mat b{font-size:16px}
+.mat span{font-size:14px;color:var(--muted)}
+.mat .sw{width:28px;height:28px;border-radius:50%;border:2px solid var(--outline)}
+.tips{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px;font-size:17px}
+.makes{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.makes div{background:var(--surface-2);border-radius:12px;padding:10px;text-align:center;font-weight:800;font-size:15px}
+.makes svg{width:70px;height:70px;display:block;margin:0 auto 4px}
+.links{display:flex;flex-direction:column;gap:6px}
+
+.pulse{animation:pulse 1.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.hop{animation:hop .6s ease}
+@keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-14px)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:520px){.brand h1{font-size:22px}.work-head h2{font-size:24px}.btn.big{font-size:20px;min-height:68px;padding:12px 22px}.bigcode button{font-size:20px;padding:8px 12px}nav.tabs button{padding:8px 12px;font-size:15px}}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><circle cx="13" cy="13" r="8" fill="#86B84E"/><circle cx="31" cy="13" r="8" fill="#86B84E"/><ellipse cx="22" cy="27" rx="16" ry="14" fill="#86B84E"/><circle cx="13" cy="13" r="3.5" fill="#1b1b1b"/><circle cx="31" cy="13" r="3.5" fill="#1b1b1b"/><ellipse cx="22" cy="32" rx="8" ry="7" fill="#F3EDDC"/><circle cx="11" cy="25" r="2.5" fill="#EE9DAA"/><circle cx="33" cy="25" r="2.5" fill="#EE9DAA"/></svg>
+      <div><h1>Edwin the Frog</h1><small><a href="../" style="color:inherit">&larr; All patterns</a> · one stitch at a time</small></div>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-v="make" aria-selected="true">Make Edwin</button>
+      <button role="tab" data-v="stitches" aria-selected="false">Stitch school</button>
+      <button role="tab" data-v="pattern" aria-selected="false">Reading the pattern</button>
+      <button role="tab" data-v="kit" aria-selected="false">What's in the box</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="v-make">
+    <div class="parts" id="parts"></div>
+    <div class="make-grid">
+      <div class="work card" id="work"></div>
+      <aside class="side">
+        <div class="card fig" id="fig"></div>
+        <div class="card steps"><h3 id="steps-h">Steps</h3><ol id="steps"></ol></div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="v-stitches" hidden>
+    <div class="school">
+      <div class="card st-list" id="st-list"></div>
+      <div class="card st-main" id="st-main"></div>
+    </div>
+  </section>
+
+  <section id="v-pattern" hidden>
+    <div class="dec-grid">
+      <div class="card panel" id="dec-left"></div>
+      <div class="card panel" id="dec-right"></div>
+    </div>
+    <div class="card panel" style="margin-top:18px">
+      <h2>The words in Edwin's pattern</h2>
+      <div class="gloss" id="gloss"></div>
+    </div>
+  </section>
+
+  <section id="v-kit" hidden>
+    <div class="kit" id="kit"></div>
+  </section>
+</main>
+<div id="modal-root"></div>
+
+<script>
+(function(){
+const $=(s,r=document)=>r.querySelector(s);
+const Y={g:'#86B84E',w:'#F3EDDC',p:'#EE9DAA'};
+const YD={g:'#6E9C3C',w:'#D8CFB8',p:'#D47C8A'};
+const YN={g:'green',w:'white',p:'pink'};
+const RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+const LINK=s=>'https://crochetbox.net/pages/'+s;
+const VID={mr:'101-08-magic-ring-mr',sc:'101-12-single-crochet',inc:'101-15-increase-inc',dec:'101-16-dec',ch:'101-10-chain-ch',sl:'101-11-slip-stitch-sl',slipknot:'101-20-slip-knot',color:'101-19-change-yarn-color',close:'101-23-close-a-ball',marker:'101-03-how-to-makers',fasten:'101-21-fasten-off',sew:'101-25-sewing',weave:'101-22-weave-in-ends',undo:'101-24-undo-stitch',hold:'101-02-hold-hook-yarn',read:'101-01-read-a-pattern',yo:'101-18-yarn-over-yo',flo:'101-06-back-front-loop',side:'101-07-wrong-right-side',knot:'101-26-knot-and-yarn-ball'};
+const ICON={
+  check:'<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>',
+  undo:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg>',
+  play:'<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12-7.5z"/></svg>',
+  pause:'<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4.5" width="4" height="15" rx="1"/><rect x="14" y="4.5" width="4" height="15" rx="1"/></svg>',
+  prev:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  next:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
+  eye:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5 3.5-5 3.5z" fill="currentColor"/></svg>',
+  ext:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></svg>',
+  hand:'<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M14.5 15.2c.8-.5 1.6-.7 2.5-.7 2.2 0 4 1.8 4 4"/></svg>'
+};
+
+/* ---------- stitch actions ---------- */
+const ACT={
+  sc:{out:1,inn:1,ab:'sc',name:'Single crochet',line:'into the next stitch',sub:'1 stitch in, 1 stitch out',how:'sc'},
+  inc:{out:2,inn:1,ab:'inc',name:'Increase',line:'2 single crochets in the SAME stitch',sub:'1 stitch in, 2 stitches out',how:'inc'},
+  dec:{out:1,inn:2,ab:'dec',name:'Decrease',line:'join the next 2 stitches into 1',sub:'2 stitches in, 1 stitch out',how:'dec'},
+  mr:{out:1,inn:0,ab:'sc',name:'Single crochet',line:'into the magic ring',sub:'Go through the middle of the ring',how:'mr'},
+  slipknot:{ab:'knot',name:'Slip knot',line:'make one and put it on your hook',sub:'This is your starting loop',how:'slipknot'},
+  ch:{ab:'ch',name:'Chain',line:'yarn over and pull through the loop',sub:'Makes one little link',how:'ch'},
+  sl2:{ab:'sl',name:'Slip stitch',line:'into the 2nd chain from the hook',sub:'Skip the chain next to your hook',how:'sl'},
+  sl:{ab:'sl',name:'Slip stitch',line:'into the next chain',sub:'Last one!',how:'sl'}
+};
+const rep=(p,n)=>{const a=[];for(let i=0;i<n;i++)a.push(...p);return a};
+function codeText(pat,times){
+  if(pat.length===1){return pat[0]==='mr'?`${times} sc in MR`:`${times} ${pat[0]}`}
+  const runs=[];pat.forEach(a=>{const l=runs[runs.length-1];if(l&&l.a===a)l.n++;else runs.push({a,n:1})});
+  return '['+runs.map(r=>r.a==='sc'?`${r.n} sc`:(r.n>1?`${r.n} ${r.a}`:r.a)).join(', ')+']';
+}
+function R(part,n,pat,times,prev,color,extra){
+  const actions=rep(pat,times);
+  const total=actions.reduce((s,a)=>s+ACT[a].out,0);
+  const x={type:'round',id:part+'-r'+n,n,pat,times,prev,actions,total,color,code:codeText(pat,times),rep:pat.length===1?'':`x ${times}`};
+  return Object.assign(x,extra||{});
+}
+function T(id,title,text,o){return Object.assign({type:'task',id,title,text},o||{})}
+
+const BODY=[
+  R('body',1,['mr'],7,0,'g',{pre:true}),
+  R('body',2,['inc'],7,7,'g'),
+  R('body',3,['sc','inc'],7,14,'g'),
+  R('body',4,['sc','sc','inc'],7,21,'g'),
+  R('body',5,['sc'],28,28,'g'),
+  R('body',6,['sc','sc','sc','inc'],7,28,'g'),
+  R('body',7,['sc'],35,35,'g',{range:'7–8'}),
+  R('body',8,['sc'],35,35,'g',{range:'7–8'}),
+  R('body',9,['sc','sc','sc','sc','inc'],7,35,'g')
+];
+for(let n=10;n<=17;n++)BODY.push(R('body',n,['sc'],42,42,'g',{range:'10–17'}));
+BODY.push(
+  R('body',18,['sc','sc','sc','sc','dec'],7,42,'g'),
+  R('body',19,['sc','sc','sc','dec'],7,35,'g'),
+  R('body',20,['sc','sc','dec'],7,28,'g'),
+  T('body-stuff','Stuff Edwin','Push stuffing in through the hole. Fill him until he feels nice and firm: not floppy, not bursting. Push some into the top too, so he keeps his shape. Leave room to keep crocheting.',{fig:'stuff'}),
+  R('body',21,['sc','dec'],7,21,'g',{note:{at:0,text:'Add a little more stuffing as the hole gets smaller, if he needs it.'}}),
+  R('body',22,['dec'],7,14,'g'),
+  T('body-close','Close the ball','Cut the yarn, leaving a tail about 20 cm (8 inches) long, and pull it through the loop on your hook. Thread the tail onto the needle. Go under the front loop of each of the last 7 stitches, then pull gently. The hole disappears! Push the needle into the body and out the other side, then snip the yarn to hide it.',{how:['close','fasten'],fig:'close'})
+);
+function EYE(k){return [
+  R('eye'+k,1,['mr'],6,0,'w',{note:{at:5,text:'Last stitch of this round: change to GREEN yarn. Watch "Change colour" to see how.',how:'color'},start:'Start with WHITE yarn.'}),
+  R('eye'+k,2,['inc'],6,6,'g'),
+  T('eye'+k+'-off','Fasten off','Cut the yarn, leaving a long tail (about 30 cm / 12 inches) for sewing later. Pull the tail through the loop on your hook to lock it.',{how:['fasten']}),
+  T('eye'+k+'-glue','Stick on the eye','Put a dot of hot glue in the middle of the white part and press a safety eye on. Hold it for a few seconds while the glue cools.',{grown:true,fig:'eyeball'})
+]}
+const BELLY=[
+  R('belly',1,['mr'],6,0,'w'),
+  R('belly',2,['inc'],6,6,'w'),
+  R('belly',3,['sc','inc'],6,12,'w'),
+  R('belly',4,['sc'],18,18,'w'),
+  T('belly-off','Fasten off','Cut the yarn, leaving a long tail (about 40 cm / 16 inches). You need it to sew the belly on. Pull it through the loop on your hook.',{how:['fasten']})
+];
+function BLUSH(k){return [
+  {type:'row',id:'blush'+k+'-row',n:1,actions:['slipknot','ch','ch','ch','sl2','sl'],color:'p',code:'slip knot, 3 ch, 2 sl',rep:'',total:2},
+  T('blush'+k+'-off','Fasten off','Cut the yarn, leaving a tail for sewing, and pull it through the loop. It is a tiny pink sausage. That is exactly right!',{how:['fasten']})
+]}
+const ASSEMBLE=[
+  T('as-eyes','Sew on the eyes','Put the eyes on top of Edwin\'s head, between rounds 3 and 4, one on each side. Use the needle and the eye\'s yarn tail to sew around the edge of each eye.',{how:['sew'],fig:'eyes'}),
+  T('as-belly','Sew on the belly','Put the top edge of the belly between rounds 10 and 11 of the body. Sew all the way around its curved edge.',{how:['sew'],fig:'belly'}),
+  T('as-blush','Sew on the blush','Put the two pink blush pieces on round 8, one on each cheek. Sew them on with their tails.',{how:['sew'],fig:'blush'}),
+  T('as-ends','Hide the yarn tails','Push each leftover tail into the body and out the other side, then snip it close. The ends hide inside.',{how:['weave'],fig:'all'})
+];
+const PARTS=[
+  {id:'body',name:'Body',color:'g',fig:'frog',steps:BODY},
+  {id:'eye1',name:'Eye 1',color:'w',color2:'g',fig:'eye',steps:EYE(1)},
+  {id:'eye2',name:'Eye 2',color:'w',color2:'g',fig:'eye',steps:EYE(2)},
+  {id:'belly',name:'Belly',color:'w',fig:'belly',steps:BELLY},
+  {id:'blush1',name:'Blush 1',color:'p',fig:'blush',steps:BLUSH(1)},
+  {id:'blush2',name:'Blush 2',color:'p',fig:'blush',steps:BLUSH(2)},
+  {id:'assemble',name:'Put it together',color:'g',fig:'frog',steps:ASSEMBLE}
+];
+
+/* ---------- state ---------- */
+const KEY='edwin-v1';
+let S={p:{},part:'body',cur:{}};
+try{const j=JSON.parse(localStorage.getItem(KEY)||'null');if(j&&j.p)S=Object.assign(S,j)}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const prog=st=>{const v=S.p[st.id];return typeof v==='number'?v:(v===true?(st.actions?st.actions.length:1):0)};
+const isDone=st=>st.type==='task'?S.p[st.id]===true:prog(st)>=st.actions.length;
+const partOf=id=>PARTS.find(p=>p.id===id);
+function partDone(p){return p.steps.every(isDone)}
+function partFrac(p){let d=0;p.steps.forEach(s=>{d+=s.type==='task'?(isDone(s)?1:0):prog(s)/s.actions.length});return d/p.steps.length}
+function curIdx(p){
+  let i=S.cur[p.id];
+  if(typeof i!=='number'){i=p.steps.findIndex(s=>!isDone(s));if(i<0)i=p.steps.length-1}
+  return i;
+}
+const stepName=st=>st.type==='round'?'Round '+st.n:(st.type==='row'?'Make it':st.title);
+
+/* ---------- round tracker drawing ---------- */
+function kidsOf(st){
+  const kids=[];let p=0;
+  st.actions.forEach((a,ai)=>{const d=ACT[a];const par=[];for(let j=0;j<d.inn;j++)par.push(p+j);p+=d.inn;for(let o=0;o<d.out;o++)kids.push({ai,par,a})});
+  return kids;
+}
+function ringSVG(st,pg,opt){
+  opt=opt||{};
+  const kids=kidsOf(st),C=kids.length,P=st.prev,mr=!P;
+  const rO=140,rI=mr?62:98;
+  const A=(i,n)=>(-90+(i+.5)*360/n)*Math.PI/180;
+  const pt=(r,a)=>[+(r*Math.cos(a)).toFixed(1),+(r*Math.sin(a)).toFixed(1)];
+  const rd=Math.min(12,Math.PI*rO/C*.72), ri=P?Math.min(9,Math.PI*rI/P*.6):0;
+  const col=Y[st.color], dcol=YD[st.color];
+  const cur=pg<st.actions.length?st.actions[pg]:null;
+  let curPar=[];kids.forEach(k=>{if(k.ai===pg)curPar=k.par});
+  let s='';
+  // earlier fabric
+  if(P){s+=`<circle r="${rI-16}" style="fill:${col};opacity:.28"/>`;
+    s+=`<text y="${-rI+38}" text-anchor="middle" style="fill:var(--muted);font:700 11px var(--font-b)">earlier rounds</text>`}
+  else{s+=`<circle r="${rI}" style="fill:none;stroke:${col};stroke-width:6"/><circle r="${rI}" style="fill:none;stroke:var(--outline);stroke-width:1"/>`;
+    s+=`<text y="${-rI+22}" text-anchor="middle" style="fill:var(--muted);font:700 11px var(--font-b)">magic ring</text>`}
+  // links kid->parent
+  kids.forEach((k,j)=>{const a=pt(rO-rd,A(j,C));
+    if(!P){return}
+    k.par.forEach(pi=>{const b=pt(rI+ri,A(pi,P));const on=k.ai===pg;
+      s+=`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" style="stroke:${on?'var(--glow)':'var(--line)'};stroke-width:${on?4:2};stroke-linecap:round"/>`})});
+  // parents
+  for(let i=0;i<P;i++){const c=pt(rI,A(i,P));const on=curPar.includes(i);
+    s+=`<circle cx="${c[0]}" cy="${c[1]}" r="${ri}" style="fill:${col};stroke:${on?'var(--glow)':'var(--outline)'};stroke-width:${on?4:1}"/>`}
+  // kids
+  kids.forEach((k,j)=>{const c=pt(rO,A(j,C));const done=k.ai<pg,on=k.ai===pg;
+    if(on)s+=`<circle class="pulse" cx="${c[0]}" cy="${c[1]}" r="${rd+6}" style="fill:none;stroke:var(--glow);stroke-width:4"/>`;
+    s+=`<circle data-ai="${k.ai}" cx="${c[0]}" cy="${c[1]}" r="${rd}" style="cursor:pointer;fill:${done?col:(on?'var(--glow)':'var(--surface)')};stroke:${done?'var(--outline)':(on?'var(--ink)':'var(--line)')};stroke-width:${on?2:2}"/>`;
+  });
+  // marker on first stitch
+  {const a=A(0,C);const c=pt(rO+rd+14,a);
+    s+=`<g transform="translate(${c[0]},${c[1]})"><path d="M0,-10 C7,-10 9,-2 0,10 C-9,-2 -7,-10 0,-10Z" style="fill:var(--marker)"/><circle cy="-3" r="3" style="fill:var(--surface)"/></g>`;}
+  // center
+  const made=kids.filter(k=>k.ai<pg).length;
+  if(opt.center!==false){
+    if(cur){s+=`<text y="${P?2:6}" text-anchor="middle" style="fill:var(--ink);font:600 ${P?40:30}px var(--font-d)">${ACT[cur].ab}</text>`;
+      s+=`<text y="${P?26:28}" text-anchor="middle" style="fill:var(--muted);font:800 ${P?14:11}px var(--font-b)">next</text>`}
+    else{s+=`<text y="10" text-anchor="middle" style="fill:var(--leaf);font:600 ${P?34:26}px var(--font-d)">${C} ✓</text>`}
+  }
+  const vb=rO+rd+30;
+  return {svg:`<svg viewBox="${-vb} ${-vb} ${vb*2} ${vb*2}" role="img" aria-label="Round diagram: ${made} of ${C} stitches made">${s}</svg>`,made,C};
+}
+function rowSVG(st,pg){
+  // slip knot at left, chains to the right; hook is on the right end
+  const col=Y.p, xs=[50,115,180,245];
+  let s=`<line x1="20" y1="110" x2="50" y2="96" style="stroke:${col};stroke-width:5;stroke-linecap:round"/>`;
+  const state=i=>i<pg?'done':(i===pg?'on':'todo');
+  const fill=i=>state(i)==='done'?col:(state(i)==='on'?'var(--glow)':'var(--surface)');
+  const strk=i=>state(i)==='done'?'var(--outline)':(state(i)==='on'?'var(--ink)':'var(--line)');
+  // knot
+  s+=`<circle cx="50" cy="90" r="16" data-ai="0" style="cursor:pointer;fill:${fill(0)};stroke:${strk(0)};stroke-width:3"/>`;
+  s+=`<text x="50" y="135" text-anchor="middle" style="fill:var(--muted);font:800 12px var(--font-b)">knot</text>`;
+  for(let c=1;c<=3;c++){const x=xs[c];
+    s+=`<ellipse cx="${x}" cy="90" rx="26" ry="14" data-ai="${c}" style="cursor:pointer;fill:${state(c)==='todo'?'none':fill(c)};stroke:${state(c)==='todo'?'var(--line)':(state(c)==='on'?'var(--glow)':col)};stroke-width:${state(c)==='on'?8:6}"/>`;
+    s+=`<text x="${x}" y="135" text-anchor="middle" style="fill:var(--muted);font:800 12px var(--font-b)">ch ${c}</text>`;}
+  // hook at right
+  s+=`<g transform="translate(278,90) rotate(-20)">${hookShape(0.7)}</g>`;
+  // slip stitches: sl2 goes into ch2 (x=180), sl into ch1 (x=115)
+  [[4,180],[5,115]].forEach(([i,x])=>{
+    s+=`<path d="M${x-14},58 Q${x},44 ${x+14},58" data-ai="${i}" style="cursor:pointer;fill:none;stroke:${state(i)==='done'?col:(state(i)==='on'?'var(--glow)':'var(--line)')};stroke-width:7;stroke-linecap:round"/>`;
+    s+=`<text x="${x}" y="36" text-anchor="middle" style="fill:var(--muted);font:800 12px var(--font-b)">sl</text>`;});
+  if(pg===4)s+=`<text x="180" y="20" text-anchor="middle" style="fill:var(--ink);font:800 12px var(--font-b)">2nd from hook</text>`;
+  return `<svg viewBox="0 0 420 150" role="img" aria-label="Blush chain diagram">${s}</svg>`;
+}
+
+/* ---------- figures ---------- */
+const BODYC=[0,7,14,21,28,28,35,35,35,42,42,42,42,42,42,42,42,42,35,28,21,14,7,0];
+const FS=12.5,FK=1/(2*Math.PI),FH=1.1;
+const RHO=BODYC.map(c=>c*FK*FS);const Z=[0];
+for(let i=1;i<BODYC.length;i++){const dr=(BODYC[i]-BODYC[i-1])*FK;Z[i]=Z[i-1]+Math.sqrt(Math.max(FH*FH-dr*dr,(.45*FH)**2))*FS}
+const TT=.28;
+function band(a,b,back){const s=back?-1:1;
+  return `M${-RHO[a]},${Z[a]} Q0,${Z[a]+s*RHO[a]*TT} ${RHO[a]},${Z[a]} L${RHO[b]},${Z[b]} Q0,${Z[b]+s*RHO[b]*TT} ${-RHO[b]},${Z[b]}Z`}
+function frogSVG(o){
+  // o: done(round count incl. closure 23), cur(round n or null), eyes, belly, blush (bool), hi:'eyes'|'belly'|'blush'|null
+  let s='';
+  const ex=RHO[3]*.95+3, ey=(Z[3]+Z[4])/2-10, er=24;
+  const eye=(x,show)=>show?`<g><circle cx="${x}" cy="${ey}" r="${er}" style="fill:${Y.g};stroke:var(--outline);stroke-width:1"/><circle cx="${x}" cy="${ey}" r="${er*.55}" style="fill:${Y.w}"/><circle cx="${x}" cy="${ey}" r="${er*.36}" style="fill:#151515"/><circle cx="${x-3}" cy="${ey-3}" r="2.6" style="fill:#fff"/></g>`
+    :`<circle cx="${x}" cy="${ey}" r="${er}" style="fill:none;stroke:var(--muted);stroke-width:2;stroke-dasharray:5 5"/>`;
+  s+=eye(-ex,o.eyes)+eye(ex,o.eyes);
+  const fillFor=(i,back)=>i<=o.done?(back?YD.g:Y.g):(i===o.cur?'var(--glow)':'var(--surface-2)');
+  for(let i=1;i<BODYC.length;i++){s+=`<path d="${band(i-1,i,true)}" style="fill:${fillFor(i,true)};stroke:var(--outline);stroke-width:.6"/>`}
+  for(let i=1;i<BODYC.length;i++){s+=`<path d="${band(i-1,i,false)}" style="fill:${fillFor(i,false)};stroke:${i<=o.done?'var(--outline)':'var(--line)'};stroke-width:.8"/>`}
+  // belly
+  const bt=Z[10],br=40,by=bt+br+4;
+  if(o.belly){s+=`<ellipse cx="0" cy="${by}" rx="${br}" ry="${br+3}" style="fill:${Y.w};stroke:var(--outline);stroke-width:1"/>`;
+    for(let k=1;k<4;k++)s+=`<ellipse cx="0" cy="${by}" rx="${br*k/4}" ry="${(br+3)*k/4}" style="fill:none;stroke:${YD.w};stroke-width:1.2"/>`}
+  else s+=`<ellipse cx="0" cy="${by}" rx="${br}" ry="${br+3}" style="fill:none;stroke:var(--muted);stroke-width:2;stroke-dasharray:5 5"/>`;
+  // blush
+  const bly=(Z[7]+Z[8])/2+5, blx=RHO[8]*.62;
+  [-blx,blx].forEach(x=>{s+=o.blush?`<ellipse cx="${x}" cy="${bly}" rx="10" ry="6.5" style="fill:${Y.p}"/>`:`<ellipse cx="${x}" cy="${bly}" rx="10" ry="6.5" style="fill:none;stroke:var(--muted);stroke-width:2;stroke-dasharray:4 4"/>`});
+  if(o.blush&&o.eyes&&o.belly&&o.smile)s+=`<path d="M-24,${bly-4} Q0,${bly+10} 24,${bly-4}" style="fill:none;stroke:#1a1a1a;stroke-width:3;stroke-linecap:round"/>`;
+  // highlight placement
+  const W=RHO[10]+30;
+  const lab=(y,t)=>`<line x1="${RHO[10]+4}" y1="${y}" x2="${W+4}" y2="${y}" style="stroke:var(--ink);stroke-width:1.5"/><text x="${W+8}" y="${y+4}" style="fill:var(--ink);font:800 11px var(--font-b)">${t}</text>`;
+  const ring=(cx,cy,rx,ry)=>`<ellipse class="pulse" cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" style="fill:none;stroke:var(--glow);stroke-width:5"/>`;
+  if(o.hi==='eyes'){s+=ring(-ex,ey,er+7,er+7)+ring(ex,ey,er+7,er+7);s+=`<path d="${band(3,4,false)}" style="fill:var(--glow);opacity:.7"/>`+lab((Z[3]+Z[4])/2,'rnds 3–4')}
+  if(o.hi==='belly'){s+=ring(0,by,br+6,br+9);s+=`<path d="M${-RHO[10]},${Z[10]} Q0,${Z[10]+RHO[10]*TT} ${RHO[10]},${Z[10]}" style="fill:none;stroke:var(--glow);stroke-width:5"/>`+lab(Z[10],'rnds 10–11')}
+  if(o.hi==='blush'){[-blx,blx].forEach(x=>s+=ring(x,bly,16,12));s+=`<path d="${band(7,8,false)}" style="fill:var(--glow);opacity:.6"/>`+lab(bly,'rnd 8')}
+  if(o.cur&&o.cur<=22){const y=(Z[o.cur-1]+Z[o.cur])/2;s+=lab(y,'rnd '+o.cur)}
+  return `<svg viewBox="-120 -48 260 300" role="img" aria-label="Edwin's body, front view">${s}</svg>`;
+}
+function discSVG(rings,cur,extra){
+  // rings: [{r,c}] ; cur = index of ring in progress
+  let s='';
+  for(let i=rings.length-1;i>=0;i--){const g=rings[i];const done=i<cur;const on=i===cur;
+    s+=`<circle r="${g.r}" style="fill:${done?Y[g.c]:(on?'var(--glow)':'var(--surface-2)')};stroke:${done?'var(--outline)':'var(--line)'};stroke-width:1.5${done||on?'':';stroke-dasharray:5 5'}"/>`}
+  if(extra)s+=extra;
+  return `<svg viewBox="-100 -100 200 200" role="img" aria-label="Piece diagram">${s}</svg>`;
+}
+
+/* ---------- MAKE VIEW ---------- */
+function renderParts(){
+  $('#parts').innerHTML=PARTS.map(p=>{const f=partFrac(p);
+    const sw=p.color2?`background:linear-gradient(90deg,${Y[p.color]} 50%,${Y[p.color2]} 50%)`:`background:${Y[p.color]}`;
+    return `<button class="part${f>=1?' done':''}" data-part="${p.id}" aria-current="${p.id===S.part}"><span class="sw" style="${sw}"></span><span style="flex:1"><b>${p.name}</b><span class="bar"><i style="width:${Math.round(f*100)}%"></i></span></span></button>`}).join('');
+}
+function renderSteps(p,ci){
+  $('#steps-h').textContent=p.name+': steps';
+  $('#steps').innerHTML=p.steps.map((st,i)=>`<li><button data-step="${i}" class="${isDone(st)?'done':''}" aria-current="${i===ci}"><span class="dot"></span>${st.type==='round'?'Rnd '+st.n:stepName(st)}</button></li>`).join('');
+}
+function figFor(p,st){
+  const d=id=>partDone(partOf(id));
+  if(p.fig==='frog'){
+    let done=0;BODY.forEach(s=>{if(s.type==='round'&&isDone(s))done=Math.max(done,s.n)});
+    if(isDone(BODY[BODY.length-1]))done=23;
+    const cur=st&&st.type==='round'&&p.id==='body'&&!isDone(st)?st.n:null;
+    const asm=p.id==='assemble';
+    const eyes=asm?isDone(ASSEMBLE[0]):false,belly=asm?isDone(ASSEMBLE[1]):false,blush=asm?isDone(ASSEMBLE[2]):false;
+    const hi=asm&&st?st.fig:null;
+    const cap=p.id==='body'?(cur?`Round ${cur} is the glowing band`:(done>=23?'Body finished!':'Edwin\'s body')):'Glowing = where it goes';
+    return frogSVG({done,cur,eyes,belly,blush,hi:hi==='all'?null:hi,smile:false})+`<div class="cap">${cap}</div>`;
+  }
+  if(p.fig==='eye'){
+    const r1=p.steps[0],r2=p.steps[1];const cur=!isDone(r1)?0:(!isDone(r2)?1:2);
+    const glued=isDone(p.steps[3]);
+    const extra=glued?`<circle r="22" style="fill:#151515"/><circle cx="-6" cy="-6" r="5" style="fill:#fff"/>`:(st&&st.fig==='eyeball'?`<circle class="pulse" r="22" style="fill:none;stroke:var(--ink);stroke-width:3;stroke-dasharray:4 4"/>`:'');
+    return discSVG([{r:42,c:'w'},{r:84,c:'g'}],cur,extra)+`<div class="cap">White middle, green edge</div>`;
+  }
+  if(p.fig==='belly'){
+    const cur=p.steps.findIndex(s=>!isDone(s));const c=cur<0?4:Math.min(cur,4);
+    return discSVG([{r:24,c:'w'},{r:48,c:'w'},{r:70,c:'w'},{r:86,c:'w'}],c)+`<div class="cap">Four rounds, flat like a pancake</div>`;
+  }
+  if(p.fig==='blush'){
+    return `<svg viewBox="-100 -60 200 120"><ellipse rx="${partDone(p)?44:44}" ry="26" style="fill:${partDone(p)?Y.p:'var(--surface-2)'};stroke:${partDone(p)?'var(--outline)':'var(--line)'};stroke-width:2;${partDone(p)?'':'stroke-dasharray:5 5'}"/></svg><div class="cap">A tiny pink bean for each cheek</div>`;
+  }
+  return '';
+}
+let lastFigDone=null;
+function renderMake(){
+  const p=partOf(S.part)||PARTS[0];
+  const ci=curIdx(p);const st=p.steps[ci];
+  renderParts();renderSteps(p,ci);
+  $('#fig').innerHTML=figFor(p,st);
+  const w=$('#work');
+  const head=`<div class="work-head"><div><div class="eyebrow">${p.name} · step ${ci+1} of ${p.steps.length}${st.color?' · '+YN[st.color]+' yarn':''}</div><h2>${stepName(st)}${st.range?` <span style="font-size:.55em;color:var(--muted)">(rounds ${st.range} are all the same)</span>`:''}</h2></div>${st.code?`<div class="code">${st.type==='round'?`<span class="c-rnd">rnd ${st.n}</span>`:''}<span class="c-st">${st.code}</span>${st.rep?`<span class="c-x">${st.rep}</span>`:''}${st.type==='round'?`<span class="c-tot">(${st.total})</span>`:''}</div>`:''}</div>`;
+  if(st.type==='task'){
+    w.innerHTML=head+`<div class="task">${st.grown?`<div class="grown">${ICON.hand} Ask a grown-up to help with this one. Hot glue is very hot!</div>`:''}<p>${st.text}</p>
+    ${st.how?`<div class="row-actions">${st.how.map(h=>STITCH[h]?`<button class="btn" data-how="${h}">${ICON.eye} Show me: ${STITCH[h].name}</button>`:`<a class="btn" href="${LINK(VID[h])}" target="_blank" rel="noopener">${ICON.ext} Video: ${LINKNAME[h]}</a>`).join('')}</div>`:''}
+    <div class="ctrl">${isDone(st)?`<button class="btn" data-act="untask">${ICON.undo} Not done yet</button>`:''}<button class="btn primary big" data-act="${isDone(st)?'next':'task'}">${ICON.check} ${isDone(st)?'Next step':'I did it!'}</button></div></div>`;
+    return;
+  }
+  const pg=prog(st), L=st.actions.length, done=pg>=L;
+  let diagram, made, C;
+  if(st.type==='row'){diagram=rowSVG(st,pg);made=Math.min(pg,L);C=L}
+  else{const r=ringSVG(st,st.pre?L:pg);diagram=r.svg;made=r.made;C=r.C}
+  let body=`<div class="tracker" id="trk">${diagram}</div>`;
+  if(st.pre&&!done){
+    body+=`<div class="instr"><div class="txt"><div class="main">This round is already made for you!</div><div class="sub">Look in the middle of the green yarn ball. You'll find a little ring of 7 stitches. Put a marker in the first stitch, then you're ready for round 2.</div></div><button class="btn" data-how="marker">${ICON.eye} How markers work</button></div>
+    <div class="ctrl"><button class="btn primary big" data-act="found">${ICON.check} Found it!</button></div>`;
+  } else if(done){
+    const nx=p.steps[ci+1];
+    body+=`<div class="complete"><h3>${st.type==='row'?'Blush done!':'Round '+st.n+' done!'}</h3>
+      ${st.type==='round'?`<p style="font-size:19px">Count your stitches. You should have <b>${st.total}</b>.${nx&&nx.type==='round'?' Move your marker up to the first stitch of the next round.':''}</p>`:''}
+      <div class="ctrl"><button class="btn" data-act="undo">${ICON.undo} Undo last</button>${nx?`<button class="btn primary big" data-act="next">Next: ${stepName(nx)} ${ICON.next}</button>`:`<button class="btn primary big" data-act="nextpart">Next part ${ICON.next}</button>`}</div></div>`;
+  } else {
+    const a=st.actions[pg], d=ACT[a];
+    const grp=st.pat&&st.pat.length>1?` · repeat ${Math.floor(pg/st.pat.length)+1} of ${st.times}`:'';
+    const first=pg===0&&st.type==='round'?`<div class="note">${st.start?st.start+' ':''}${st.prev?'Put your marker in the first stitch of this round, then start.':(st.start?'':'Start by making a magic ring.')}</div>`:'';
+    const note=st.note&&st.note.at===pg?`<div class="note">${st.note.text}${st.note.how?` <button class="btn small" data-how="${st.note.how}">${ICON.eye} Show me</button>`:''}</div>`:'';
+    body+=first+note+`<div class="instr"><div class="txt"><div class="main"><span class="badge">${d.ab}</span>${d.name}: ${d.line}</div><div class="sub">${d.sub}${grp}</div></div><button class="btn" data-how="${d.how}">${ICON.eye} Show me</button></div>
+    <div class="ctrl"><button class="btn" data-act="undo" ${pg===0?'disabled style="opacity:.4"':''}>${ICON.undo} Undo</button><button class="btn primary big" data-act="done">${ICON.check} Done</button></div>
+    <div class="tally">${st.type==='row'?`Step <span class="n">${pg+1}</span> of ${L}`:`Stitches made: <span class="n">${made}</span> / ${C}`}</div>
+    <div style="text-align:center;color:var(--muted);font-size:14px;font-weight:600">Tap a dot to jump to it if you lost count. Space bar works too.</div>`;
+  }
+  w.innerHTML=head+body;
+}
+function setProg(st,v){S.p[st.id]=Math.max(0,Math.min(st.actions.length,v));save()}
+function hop(){const f=$('#fig svg');if(f&&!RM){f.classList.remove('hop');void f.getBoundingClientRect();f.classList.add('hop')}}
+let wake=null;
+async function keepAwake(){try{if(!wake&&navigator.wakeLock){wake=await navigator.wakeLock.request('screen');wake.addEventListener('release',()=>wake=null)}}catch(e){}}
+function act(kind){
+  const p=partOf(S.part),ci=curIdx(p),st=p.steps[ci];
+  if(kind==='done'){keepAwake();setProg(st,prog(st)+1);if(isDone(st))hop()}
+  else if(kind==='undo'){setProg(st,prog(st)-1)}
+  else if(kind==='found'){setProg(st,st.actions.length);hop()}
+  else if(kind==='task'){S.p[st.id]=true;save();hop();if(ci+1<p.steps.length)S.cur[p.id]=ci+1}
+  else if(kind==='untask'){delete S.p[st.id];save()}
+  else if(kind==='next'){if(ci+1<p.steps.length)S.cur[p.id]=ci+1;save()}
+  else if(kind==='nextpart'){const i=PARTS.indexOf(p);const nx=PARTS.slice(i+1).find(q=>!partDone(q))||PARTS.find(q=>!partDone(q));if(nx){S.part=nx.id;delete S.cur[nx.id]}save()}
+  renderMake();
+}
+$('#v-make').addEventListener('click',e=>{
+  const b=e.target.closest('[data-act],[data-part],[data-step],[data-how],[data-ai]');if(!b)return;
+  if(b.dataset.act)act(b.dataset.act);
+  else if(b.dataset.part){S.part=b.dataset.part;delete S.cur[S.part];save();renderMake()}
+  else if(b.dataset.step){S.cur[S.part]=+b.dataset.step;save();renderMake()}
+  else if(b.dataset.how)openHow(b.dataset.how);
+  else if(b.dataset.ai!=null){const p=partOf(S.part),st=p.steps[curIdx(p)];if(st.actions&&!st.pre){setProg(st,+b.dataset.ai+1);renderMake()}}
+});
+document.addEventListener('keydown',e=>{
+  if($('#v-make').hidden||$('#modal-root').firstChild)return;
+  if(e.target.closest&&e.target.closest('input,textarea'))return;
+  if(e.code==='Space'){const d=$('#work [data-act="done"]');if(d){e.preventDefault();act('done')}}
+});
+
+/* ---------- HOOK + SCENES ---------- */
+function hookShape(sc){sc=sc||1;
+  return `<g transform="scale(${sc})"><rect x="2" y="-6" width="330" height="12" rx="6" style="fill:var(--metal);stroke:var(--metal-dark);stroke-width:1"/><rect x="150" y="-10" width="200" height="20" rx="10" style="fill:var(--grip);stroke:#b97f10;stroke-width:1"/><path d="M-2,0 C-2,-8 8,-9 12,-6 L22,-6 L14,-1 C10,1 8,3 8,6 L4,6 C-1,6 -2,3 -2,0Z" style="fill:var(--metal);stroke:var(--metal-dark);stroke-width:1"/><path d="M12,-6 L22,-6 L14,-1Z" style="fill:var(--metal-dark)"/></g>`}
+const BX=[80,160,240,320,400],BY=240;
+let UID=0;
+function hookInit(svg){const u='a'+(++UID);
+  svg.innerHTML=`<defs><marker id="${u}" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10z" style="fill:var(--c-rnd)"/></marker></defs><g class="fab"></g><g class="made"></g><g class="chain"></g><g class="hk"><g class="hk-body">${hookShape()}</g><g class="hk-yarn"></g><g class="hk-lab"></g></g><g class="front"></g><g class="glab"></g>`;
+  svg.dataset.mk=u;
+}
+function stitchTop(x,y,col,rx,ry,hl,flo){
+  let s=`<rect x="${x-13}" y="${y+8}" width="26" height="${300-y}" rx="8" style="fill:${Y[col]};stroke:var(--outline);stroke-width:1"/>`;
+  s+=`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" style="fill:${YD[col]};stroke:var(--outline);stroke-width:1"/>`;
+  s+=`<path d="M${x-rx},${y} A${rx},${ry} 0 0,0 ${x+rx},${y}" style="fill:none;stroke:${Y[col]};stroke-width:7;stroke-linecap:round"/>`;
+  s+=`<path d="M${x-rx+4},${y-2} A${rx-4},${ry-3} 0 0,1 ${x+rx-4},${y-2}" style="fill:none;stroke:${Y[col]};stroke-width:5;stroke-linecap:round"/>`;
+  if(hl)s+=`<ellipse class="pulse" cx="${x}" cy="${y}" rx="${rx+8}" ry="${ry+8}" style="fill:none;stroke:var(--glow);stroke-width:4"/>`;
+  if(flo)s+=`<path d="M${x-rx},${y} A${rx},${ry} 0 0,0 ${x+rx},${y}" style="fill:none;stroke:var(--glow);stroke-width:5;stroke-linecap:round"/>`;
+  return s;
+}
+function hookRender(svg,f){
+  const col=f.col||'g';
+  const fab=svg.querySelector('.fab'),made=svg.querySelector('.made'),chain=svg.querySelector('.chain'),hk=svg.querySelector('.hk'),yarn=svg.querySelector('.hk-yarn'),lab=svg.querySelector('.hk-lab'),front=svg.querySelector('.front'),glab=svg.querySelector('.glab');
+  const T=f.t||[];
+  // fabric
+  let s='';
+  if(f.base!==false){BX.forEach((x,i)=>{s+=stitchTop(x,BY,f.bcol||col,32,11,T.includes(i)&&f.hook==='up'&&!f.made2,(f.flo||[]).includes(i)&&f.floHl)})}
+  fab.innerHTML=s;
+  // made stitches
+  let m='';(f.made||[]).forEach(o=>{
+    const c=Y[o.c||col],dc=YD[o.c||col];
+    const one=(x,rx)=>`<rect x="${x-9}" y="${BY-44}" width="18" height="34" rx="6" style="fill:${c};stroke:var(--outline);stroke-width:1"/><ellipse cx="${x}" cy="${BY-48}" rx="${rx}" ry="8" style="fill:${dc};stroke:var(--outline);stroke-width:1"/><path d="M${x-rx},${BY-48} A${rx},8 0 0,0 ${x+rx},${BY-48}" style="fill:none;stroke:${c};stroke-width:5"/>`;
+    if(o.k==='one')m+=one(BX[o.at],24);
+    if(o.k==='inc1')m+=one(BX[o.at]-15,16);
+    if(o.k==='inc2')m+=one(BX[o.at]-15,16)+one(BX[o.at]+15,16);
+    if(o.k==='dec'){const x=(BX[o.at]+BX[o.at+1])/2;m+=`<path d="M${BX[o.at]},${BY-8} L${x-6},${BY-40} L${x+6},${BY-40} L${BX[o.at+1]},${BY-8}" style="fill:${c};stroke:var(--outline);stroke-width:1;stroke-linejoin:round"/>`+one(x,28)}
+    if(o.k==='sl')m+=`<ellipse cx="${BX[o.at]}" cy="${BY-14}" rx="20" ry="6" style="fill:${dc};stroke:var(--outline)"/>`;
+  });
+  made.innerHTML=m;
+  // chain
+  let c='';
+  if(f.hook==='chain'){
+    for(let j=0;j<(f.chain||0);j++){const x=262-j*34;c+=`<ellipse cx="${x}" cy="170" rx="16" ry="9" style="fill:none;stroke:${Y[col]};stroke-width:6"/><ellipse cx="${x}" cy="170" rx="16" ry="9" style="fill:none;stroke:var(--outline);stroke-width:1"/>`}
+    const ex=262-(f.chain||0)*34+14;c+=`<circle cx="${ex}" cy="172" r="9" style="fill:${Y[col]};stroke:var(--outline)"/><path d="M${ex-6},178 Q${ex-30},210 ${ex-40},250" style="fill:none;stroke:${Y[col]};stroke-width:5;stroke-linecap:round"/>`;
+  }
+  chain.innerHTML=c;
+  // hook position
+  let tx,ty;const tgt=T[T.length-1];
+  if(f.hook==='in'){tx=BX[tgt]-2;ty=BY+1}else if(f.hook==='chain'){tx=296;ty=170}else{tx=(tgt!=null?BX[tgt]:240)+10;ty=150}
+  hk.style.transform=`translate(${tx}px,${ty}px) rotate(-18deg)`;
+  // loops on hook (newest nearest tip)
+  const L=f.loops||[];const n=L.length;let y='';
+  const lx=i=>40+(n-1-i)*22;
+  L.forEach((lc,i)=>{const x=lx(i);const hl=(f.hl||[]).includes(i);
+    if(hl)y+=`<ellipse class="pulse" cx="${x}" cy="0" rx="10" ry="19" style="fill:none;stroke:var(--glow);stroke-width:7"/>`;
+    y+=`<ellipse cx="${x}" cy="0" rx="6" ry="15" style="fill:none;stroke:${Y[lc]};stroke-width:6"/><ellipse cx="${x}" cy="0" rx="6" ry="15" style="fill:none;stroke:var(--outline);stroke-width:1"/>`});
+  const ycol=Y[f.yarn||col];
+  if(f.yo){y+=`<path d="M22,-12 C6,-26 -16,-10 -6,4 C0,12 12,10 16,4" style="fill:none;stroke:${ycol};stroke-width:6;stroke-linecap:round"/>`;
+    y+=`<path d="M22,-12 C60,-40 100,-120 150,-230" style="fill:none;stroke:${ycol};stroke-width:6;stroke-linecap:round"/>`}
+  else{const x0=n?lx(0):30;y+=`<path d="M${x0},-15 C${x0+30},-60 100,-120 150,-230" style="fill:none;stroke:${ycol};stroke-width:6;stroke-linecap:round"/>`}
+  if(f.pull){const end=lx(n-f.pull)+16;y+=`<path d="M-4,-30 L${end},-30" style="fill:none;stroke:var(--c-rnd);stroke-width:4;stroke-linecap:round;marker-end:url(#${svg.dataset.mk})"/>`}
+  yarn.innerHTML=y;
+  let l='';
+  const bubble=(t,x,yy)=>`<g transform="translate(${x},${yy}) rotate(18)"><rect x="-4" y="-17" width="${t.length*8.4+16}" height="26" rx="13" style="fill:var(--ink)"/><text x="4" y="1" style="fill:var(--surface);font:800 14px var(--font-b)">${t}</text></g>`;
+  if(f.pull)l+=bubble('pull through '+(f.pull===1?'1 loop':f.pull+' loops'),10,-58);
+  else if(f.yo)l+=bubble(f.yoLab||'yarn over',-30,-46);
+  lab.innerHTML=l;
+  // front loop overlay when hook is inside a stitch
+  let fr='';
+  if(f.hook==='in'&&!f.floOnHook){T.forEach(i=>{const x=BX[i];fr+=`<path d="M${x-32},${BY} A32,11 0 0,0 ${x+32},${BY}" style="fill:none;stroke:${Y[f.bcol||col]};stroke-width:7;stroke-linecap:round"/>`})}
+  front.innerHTML=fr;
+  glab.innerHTML=f.glab?`<text x="${f.glab[1]}" y="${f.glab[2]}" text-anchor="middle" style="fill:var(--ink);font:800 15px var(--font-b)">${f.glab[0]}</text>`:'';
+}
+function scSeq(t,pre,madeBefore,col,last){
+  const mb=madeBefore||[];col=col||'g';
+  return [
+    {hook:'up',t:[t],loops:[col],made:mb,cap:pre+'Start with one loop on your hook. The glowing stitch is where you go next.'},
+    {hook:'in',t:[t],loops:[col],made:mb,cap:pre+'Push the hook into the stitch, under BOTH loops of the V.'},
+    {hook:'in',t:[t],loops:[col],yo:true,made:mb,cap:'Yarn over: wrap the yarn over your hook, from the back to the front.'},
+    {hook:'up',t:[t],loops:[col,col],made:mb,cap:'Pull the yarn back out of the stitch. Now there are 2 loops on your hook.'},
+    {hook:'up',t:[t],loops:[col,col],yo:true,hl:[0,1],made:mb,cap:'Yarn over again.'},
+    {hook:'up',t:[t],loops:[col,col],yo:true,pull:2,hl:[0,1],made:mb,cap:'Pull through BOTH loops in one go.'},
+    {hook:'up',t:[t],loops:[col],made:last,made2:true,cap:'One loop left on your hook. That\'s one single crochet!'}
+  ];
+}
+const STITCH={
+  sc:{name:'Single crochet',ab:'sc',kind:'hook',why:'The stitch Edwin is mostly made of. You go into a stitch, and one new stitch comes out on top.',frames:scSeq(2,'',[],'g',[{k:'one',at:2}])},
+  inc:{name:'Increase',ab:'inc',kind:'hook',why:'Two single crochets in the same stitch. It makes the round bigger, so Edwin grows wider.',
+    frames:[...scSeq(2,'First single crochet. ',[],'g',[{k:'inc1',at:2}]),
+      ...scSeq(2,'Second one, in the SAME stitch! ',[{k:'inc1',at:2}],'g',[{k:'inc2',at:2}]).slice(1).map((f,i,a)=>i===a.length-1?Object.assign(f,{cap:'Two new stitches came out of one stitch. That\'s an increase!'}):f)]},
+  dec:{name:'Decrease (invisible)',ab:'dec',kind:'hook',why:'Two stitches joined into one. It makes the round smaller, so Edwin gets narrower at the bottom. Going into the front loops only hides the join.',
+    frames:[
+      {hook:'up',t:[1,2],loops:['g'],cap:'Start with one loop on your hook. You will use the next 2 stitches (glowing).'},
+      {hook:'in',t:[1],loops:['g'],floOnHook:true,flo:[1],floHl:true,cap:'Push the hook under only the FRONT loop of the first stitch.'},
+      {hook:'in',t:[1],loops:['g','g'],floOnHook:true,flo:[1,2],floHl:true,cap:'Now under the FRONT loop of the second stitch too. 3 loops on your hook.',l3:true},
+      {hook:'in',t:[2],loops:['g','g','g'],floOnHook:true,yo:true,hl:[1,2],pull:2,cap:'Yarn over and pull through the 2 front loops.'},
+      {hook:'up',t:[2],loops:['g','g'],cap:'Now you have 2 loops on your hook.'},
+      {hook:'up',t:[2],loops:['g','g'],yo:true,pull:2,hl:[0,1],cap:'Yarn over and pull through both loops.'},
+      {hook:'up',t:[2],loops:['g'],made:[{k:'dec',at:1}],made2:true,cap:'Done! Two stitches became one stitch. That\'s a decrease.'}]},
+  ch:{name:'Chain',ab:'ch',kind:'hook',why:'A chain is a little link. The blush starts with 3 of them.',
+    frames:[
+      {hook:'chain',base:false,loops:['p'],chain:0,col:'p',cap:'Start with a slip knot on your hook.'},
+      {hook:'chain',base:false,loops:['p'],chain:0,col:'p',yo:true,cap:'Yarn over.'},
+      {hook:'chain',base:false,loops:['p'],chain:0,col:'p',yo:true,pull:1,hl:[0],cap:'Pull the yarn through the loop on your hook.'},
+      {hook:'chain',base:false,loops:['p'],chain:1,col:'p',cap:'That\'s 1 chain! See the little link?'},
+      {hook:'chain',base:false,loops:['p'],chain:1,col:'p',yo:true,pull:1,hl:[0],cap:'Yarn over and pull through again...'},
+      {hook:'chain',base:false,loops:['p'],chain:2,col:'p',cap:'2 chains.'},
+      {hook:'chain',base:false,loops:['p'],chain:2,col:'p',yo:true,pull:1,hl:[0],cap:'And once more...'},
+      {hook:'chain',base:false,loops:['p'],chain:3,col:'p',cap:'3 chains. The loop on your hook does not count as a chain.'}]},
+  sl:{name:'Slip stitch',ab:'sl',kind:'hook',why:'The smallest, flattest stitch. On the blush you do 2 of them into the chains.',
+    frames:[
+      {hook:'up',t:[2],loops:['p'],col:'p',cap:'Start with one loop on your hook.'},
+      {hook:'in',t:[2],loops:['p'],col:'p',cap:'Push the hook into the next stitch (on the blush: into a chain).'},
+      {hook:'in',t:[2],loops:['p'],col:'p',yo:true,cap:'Yarn over.'},
+      {hook:'in',t:[2],loops:['p'],col:'p',yo:true,pull:1,hl:[0],cap:'Pull through the stitch AND the loop on your hook, all in one go.'},
+      {hook:'up',t:[2],loops:['p'],col:'p',made:[{k:'sl',at:2,c:'p'}],made2:true,cap:'Done. A slip stitch is tiny and flat.'}]},
+  color:{name:'Change colour',ab:'swap',kind:'hook',why:'On each eye you start in white and switch to green in the last stitch of round 1.',
+    frames:[
+      {hook:'up',t:[2],loops:['w'],col:'w',bcol:'w',cap:'Start the LAST stitch of the round in white, like a normal single crochet.'},
+      {hook:'in',t:[2],loops:['w'],col:'w',bcol:'w',yo:true,cap:'Hook into the stitch, yarn over with white...'},
+      {hook:'up',t:[2],loops:['w','w'],col:'w',bcol:'w',cap:'...and pull it out. STOP here, with 2 white loops on your hook.'},
+      {hook:'up',t:[2],loops:['w','w'],col:'w',bcol:'w',yarn:'g',yo:true,yoLab:'yarn over in GREEN',hl:[0,1],cap:'Drop the white. Pick up the green and yarn over with it.'},
+      {hook:'up',t:[2],loops:['w','w'],col:'w',bcol:'w',yarn:'g',yo:true,pull:2,hl:[0,1],cap:'Pull the green through both white loops.'},
+      {hook:'up',t:[2],loops:['g'],col:'g',bcol:'w',yarn:'g',made:[{k:'one',at:2,c:'w'}],made2:true,cap:'The loop on your hook is green now. Keep going in green! Tie the two tails together loosely so they don\'t come undone.'}]},
+  mr:{name:'Magic ring',ab:'MR',kind:'ring',why:'The way to start a round piece. Edwin\'s eyes and belly both start with 6 single crochets in a magic ring.',n:6,
+    frames:[
+      {fingers:true,sts:0,cap:'Wrap the yarn around 2 fingers to make a loop. The short tail hangs down. The yarn going to the ball crosses over it.'},
+      {sts:0,hook:-1,cap:'Push the hook through the middle of the ring, grab the ball yarn, and pull it back through.'},
+      {sts:0,hook:-1,cap:'Yarn over and pull through the loop on your hook. That locks it. (This does not count as a stitch.)'},
+      {sts:1,hook:1,cap:'Single crochet into the ring: go through the middle, over the ring AND the tail. Stitch 1.'},
+      {sts:2,hook:2,cap:'Stitch 2.'},{sts:3,hook:3,cap:'Stitch 3.'},{sts:4,hook:4,cap:'Stitch 4.'},{sts:5,hook:5,cap:'Stitch 5.'},
+      {sts:6,hook:6,cap:'Stitch 6. That\'s round 1 of an eye or the belly.'},
+      {sts:6,closed:true,cap:'Pull the tail. The ring shrinks and the hole closes. Magic!'}]},
+  close:{name:'Close the ball',ab:'close',kind:'close',why:'How to make the last little hole at the bottom of Edwin disappear.',n:7,
+    frames:[
+      {thread:0,cap:'Cut the yarn, leaving a tail about 20 cm (8 inches). Thread it on the needle.'},
+      {thread:1,cap:'Push the needle under the FRONT loop of stitch 1.'},
+      {thread:2,cap:'Then the front loop of stitch 2.'},
+      {thread:4,cap:'Keep going round...'},
+      {thread:7,cap:'...until you have been through all 7 stitches.'},
+      {thread:7,closed:true,cap:'Pull the yarn gently. The hole closes up!'},
+      {thread:7,closed:true,hide:true,cap:'Push the needle into the middle and out somewhere on the body. Snip the yarn. The end hides inside Edwin.'}]},
+  slipknot:{name:'Slip knot',ab:'knot',kind:'steps',why:'The first loop on your hook when you start with chains, like the blush.',
+    steps:['Make a loop with the yarn. Let the short tail hang down behind it.','Reach through the loop and grab the yarn that goes to the ball.','Pull it through to make a new loop.','Put the new loop on your hook and gently pull both ends. Snug, not tight!']},
+  marker:{name:'Using markers',ab:'mark',kind:'steps',why:'Edwin goes round and round in a spiral, with no join. A marker shows you where each round starts.',
+    steps:['Before a round, clip a marker into the first stitch you make.','Crochet all the way round until you get back to the marker.','Take the marker out, make the first stitch of the next round, and clip the marker into that new stitch.','Count from the marker if you think you lost a stitch.']}
+};
+const LINKNAME={fasten:'Fasten off',sew:'Sewing pieces on',weave:'Weave in ends',undo:'Undo stitches',hold:'Holding hook & yarn',read:'Reading a pattern',flo:'Front & back loops',side:'Right side & wrong side',knot:'A knot in the yarn'};
+STITCH.sc.video=VID.sc;STITCH.inc.video=VID.inc;STITCH.dec.video=VID.dec;STITCH.ch.video=VID.ch;STITCH.sl.video=VID.sl;STITCH.color.video=VID.color;STITCH.mr.video=VID.mr;STITCH.close.video=VID.close;STITCH.slipknot.video=VID.slipknot;STITCH.marker.video=VID.marker;
+
+function ringRender(svg,f,def){
+  const n=def.n;const cx=240,cy=150,rr=60;let s='';
+  if(f.fingers)s+=`<rect x="190" y="20" width="44" height="200" rx="22" style="fill:var(--skin)"/><rect x="246" y="30" width="44" height="190" rx="22" style="fill:var(--skin)"/>`;
+  s+=`<path d="M${cx-30},${cy+52} Q${cx-60},${cy+110} ${cx-80},${cy+150}" style="fill:none;stroke:${Y.w};stroke-width:6;stroke-linecap:round"/>`;
+  s+=`<g class="scale" style="transform-origin:${cx}px ${cy}px;transform:scale(${f.closed?.5:1})">`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${rr}" style="fill:none;stroke:${Y.w};stroke-width:7"/><circle cx="${cx}" cy="${cy}" r="${rr}" style="fill:none;stroke:var(--outline);stroke-width:1"/>`;
+  for(let i=0;i<f.sts;i++){const a=(-90+(i+.5)*360/n);
+    s+=`<g transform="translate(${cx},${cy}) rotate(${a})"><rect x="${rr-12}" y="-9" width="44" height="18" rx="7" style="fill:${Y.w};stroke:var(--outline)"/><ellipse cx="${rr+38}" cy="0" rx="9" ry="22" style="fill:${YD.w};stroke:var(--outline)"/></g>`}
+  s+=`</g>`;
+  s+=`<path d="M${cx+40},${cy-44} Q${cx+110},${cy-110} ${cx+200},${cy-140}" style="fill:none;stroke:${Y.w};stroke-width:6;stroke-linecap:round"/>`;
+  if(f.hook!=null&&!f.closed){const k=f.hook<0?0:f.hook;const a=(-90+(k+.5)*360/n)+(f.hook<0?40:30);const ar=a*Math.PI/180;
+    const tx=cx+Math.cos(ar)*(rr-6),ty=cy+Math.sin(ar)*(rr-6);
+    s+=`<g transform="translate(${tx},${ty}) rotate(${a})">${hookShape(.55)}</g>`}
+  if(f.closed)s+=`<text x="${cx}" y="285" text-anchor="middle" style="fill:var(--ink);font:800 15px var(--font-b)">pull the tail ↓</text>`;
+  else if(f.sts)s+=`<text x="${cx}" y="290" text-anchor="middle" style="fill:var(--ink);font:800 15px var(--font-b)">${f.sts} of ${n} stitches</text>`;
+  svg.innerHTML=s;
+}
+function closeRender(svg,f,def){
+  const n=def.n,cx=240,cy=150,rr=66;let s='';
+  s+=`<circle cx="${cx}" cy="${cy}" r="140" style="fill:${Y.g};stroke:var(--outline)"/>`;
+  s+=`<g class="scale" style="transform-origin:${cx}px ${cy}px;transform:scale(${f.closed?.28:1})">`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${rr-12}" style="fill:#EFEDE6"/><circle cx="${cx}" cy="${cy}" r="${rr-12}" style="fill:none;stroke:var(--outline)"/>`;
+  const pts=[];
+  for(let i=0;i<n;i++){const a=(-90+i*360/n);const ar=a*Math.PI/180;const x=cx+Math.cos(ar)*rr,y=cy+Math.sin(ar)*rr;pts.push([x,y]);
+    s+=`<g transform="translate(${x},${y}) rotate(${a+90})"><ellipse rx="22" ry="10" style="fill:${YD.g};stroke:var(--outline)"/><path d="M-22,0 A22,10 0 0,1 22,0" style="fill:none;stroke:${i<f.thread?'var(--glow)':Y.g};stroke-width:6;stroke-linecap:round"/></g>`;
+    s+=`<text x="${cx+Math.cos(ar)*(rr+30)}" y="${cy+Math.sin(ar)*(rr+30)+5}" text-anchor="middle" style="fill:#1f2e18;font:800 13px var(--font-b)">${i+1}</text>`}
+  if(f.thread){let d=`M${pts[0][0]},${pts[0][1]}`;for(let i=1;i<f.thread;i++)d+=` L${pts[i][0]},${pts[i][1]}`;
+    s+=`<path d="${d}" style="fill:none;stroke:${Y.g};stroke-width:4;stroke-dasharray:2 0"/><path d="${d}" style="fill:none;stroke:#2b4417;stroke-width:1.5"/>`}
+  s+=`</g>`;
+  if(f.thread&&!f.closed){const p=pts[f.thread-1];s+=`<line x1="${p[0]}" y1="${p[1]}" x2="${p[0]+60}" y2="${p[1]-50}" style="stroke:var(--metal-dark);stroke-width:4;stroke-linecap:round"/>`}
+  if(f.hide)s+=`<line x1="${cx}" y1="${cy}" x2="${cx+150}" y2="${cy-120}" style="stroke:var(--metal-dark);stroke-width:4;stroke-linecap:round;stroke-dasharray:8 6"/>`;
+  svg.innerHTML=s;
+}
+
+function Player(host,key){
+  const def=STITCH[key];let i=0,timer=null,slow=false;
+  if(def.kind==='steps'){
+    host.innerHTML=`<div class="player"><ol class="steplist">${def.steps.map(t=>`<li>${t}</li>`).join('')}</ol>${def.video?`<a class="btn" href="${LINK(def.video)}" target="_blank" rel="noopener">${ICON.ext} Watch the CrochetBox video</a>`:''}</div>`;
+    return {stop(){}};
+  }
+  host.innerHTML=`<div class="player"><div class="stage"><svg viewBox="0 0 480 300" role="img" aria-label="${def.name} animation"></svg></div>
+    <div class="pl-cap"><div class="pl-step"><span class="stepn"></span><span class="chips"></span></div><p class="pl-text"></p></div>
+    <div class="pl-ctrl"><button class="btn small" data-p="prev" aria-label="Previous step">${ICON.prev}</button><button class="btn small primary" data-p="play">${ICON.play} Play</button><button class="btn small" data-p="next" aria-label="Next step">${ICON.next}</button><button class="btn small" data-p="slow" aria-pressed="false">Slow</button><div class="dots"></div></div>
+    ${def.video?`<a class="btn" style="align-self:flex-start" href="${LINK(def.video)}" target="_blank" rel="noopener">${ICON.ext} Watch the real-hands video on CrochetBox</a>`:''}</div>`;
+  const svg=host.querySelector('svg');
+  if(def.kind==='hook')hookInit(svg);
+  const F=def.frames;
+  const dots=host.querySelector('.dots');dots.innerHTML=F.map((_,k)=>`<button data-k="${k}" aria-label="Step ${k+1}"></button>`).join('');
+  function show(){
+    const f=F[i];
+    if(def.kind==='hook')hookRender(svg,f);else if(def.kind==='ring')ringRender(svg,f,def);else closeRender(svg,f,def);
+    host.querySelector('.stepn').textContent=`Step ${i+1} of ${F.length}`;
+    host.querySelector('.pl-text').textContent=f.cap;
+    host.querySelector('.chips').innerHTML=f.loops?`<span class="chip">Loops on hook: ${f.loops.length}</span>`:'';
+    [...dots.children].forEach((d,k)=>d.classList.toggle('on',k<=i));
+  }
+  function setPlay(on){
+    clearInterval(timer);timer=null;
+    const b=host.querySelector('[data-p="play"]');
+    if(on){timer=setInterval(()=>{if(i<F.length-1){i++;show()}else{setPlay(false)}},slow?4200:2700);b.innerHTML=ICON.pause+' Pause'}
+    else b.innerHTML=ICON.play+(i>=F.length-1?' Again':' Play');
+  }
+  host.addEventListener('click',e=>{const b=e.target.closest('[data-p],[data-k]');if(!b)return;
+    if(b.dataset.k!=null){i=+b.dataset.k;show();setPlay(false);return}
+    const p=b.dataset.p;
+    if(p==='prev'){i=Math.max(0,i-1);show();setPlay(false)}
+    if(p==='next'){i=Math.min(F.length-1,i+1);show();setPlay(false)}
+    if(p==='play'){if(timer)setPlay(false);else{if(i>=F.length-1){i=0;show()}setPlay(true)}}
+    if(p==='slow'){slow=!slow;b.setAttribute('aria-pressed',slow);b.classList.toggle('primary',slow);if(timer)setPlay(true)}
+  });
+  show();
+  if(!RM)setTimeout(()=>{if(host.isConnected&&!timer&&i===0)setPlay(true)},700);
+  return {stop(){clearInterval(timer)}};
+}
+
+/* modal */
+let modalPlayer=null;
+function openHow(key){
+  const root=$('#modal-root');
+  if(!STITCH[key]){window.open&&0;return}
+  const def=STITCH[key];
+  root.innerHTML=`<div class="overlay"><div class="card modal" role="dialog" aria-modal="true" aria-label="${def.name}"><div class="modal-head"><h2>${def.name}</h2><button class="btn small" data-close>Close</button></div><p style="color:var(--muted);font-size:17px">${def.why}</p><div id="mp"></div></div></div>`;
+  modalPlayer=Player($('#mp'),key);
+  const close=()=>{modalPlayer&&modalPlayer.stop();root.innerHTML=''};
+  root.querySelector('.overlay').addEventListener('click',e=>{if(e.target.classList.contains('overlay')||e.target.closest('[data-close]'))close()});
+  root.querySelector('[data-close]').focus();
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#modal-root').firstChild){modalPlayer&&modalPlayer.stop();$('#modal-root').innerHTML=''}});
+
+/* ---------- STITCH SCHOOL ---------- */
+const SCHOOL=[
+  ['Stitches Edwin uses',['mr','sc','inc','dec','color','close']],
+  ['For the blush',['slipknot','ch','sl']],
+  ['Helpful',['marker']]
+];
+const EXTRA=['hold','fasten','sew','weave','undo','flo','knot'];
+let schoolKey='sc',schoolPlayer=null;
+function renderSchool(){
+  $('#st-list').innerHTML=SCHOOL.map(([h,ks])=>`<h3>${h}</h3>`+ks.map(k=>`<button class="st-item" data-k="${k}" aria-current="${k===schoolKey}"><span class="ab">${STITCH[k].ab}</span><span>${STITCH[k].name}</span></button>`).join('')).join('')
+    +`<h3>CrochetBox videos</h3>`+EXTRA.map(k=>`<a class="st-item ext" href="${LINK(VID[k])}" target="_blank" rel="noopener" style="text-decoration:none;color:var(--ink)"><span class="ab">${ICON.ext}</span><span>${LINKNAME[k]}</span></a>`).join('');
+  const d=STITCH[schoolKey];
+  $('#st-main').innerHTML=`<div><div class="eyebrow">Stitch school</div><h2>${d.name}</h2></div><p class="why">${d.why}</p><div id="sp"></div>`;
+  schoolPlayer&&schoolPlayer.stop();schoolPlayer=Player($('#sp'),schoolKey);
+}
+$('#st-list').addEventListener('click',e=>{const b=e.target.closest('button[data-k]');if(!b)return;schoolKey=b.dataset.k;renderSchool()});
+
+/* ---------- PATTERN DECODER ---------- */
+const SAMPLES=[BODY[3],BODY[2],BODY[4],BODY[8],BODY[17],BODY[22]];
+let decSt=SAMPLES[0],decPart='st',decPg=0,decTimer=null;
+const PIECES={
+  rnd:{c:'var(--c-rnd)',h:'Which round',t:n=>`This is round ${n}. Edwin is made in a spiral, round and round like a snail shell. Each trip around is one round.`},
+  st:{c:'var(--c-st)',h:'What to do',t:st=>st.pat.length>1?`Inside the brackets is a little recipe: ${recipe(st.pat)}. You do it from left to right.`:(st.pat[0]==='sc'?`Do ${st.times} single crochets, one in each stitch.`:`Do ${st.times} ${ACT[st.pat[0]].name.toLowerCase()}s in a row.`)},
+  x:{c:'var(--c-x)',h:'How many times',t:st=>`Do the recipe in the brackets ${st.times} times, one after the other.`},
+  tot:{c:'var(--c-tot)',h:'Your stitch count',t:st=>`At the end of the round you should have ${st.total} stitches. Count them to check! If the number is different, a stitch was missed or doubled.`}
+};
+function recipe(p){const runs=[];p.forEach(a=>{const l=runs[runs.length-1];if(l&&l.a===a)l.n++;else runs.push({a,n:1})});
+  return runs.map(r=>r.a==='sc'?`${r.n} single crochet${r.n>1?'s':''}`:(r.a==='inc'?'1 increase':'1 decrease')).join(', then ')}
+function renderDecoder(){
+  const st=decSt;
+  const pieces=[['rnd','rnd '+st.n],['st',st.code]];if(st.rep)pieces.push(['x',st.rep]);pieces.push(['tot','('+st.total+')']);
+  const P=PIECES[decPart]||PIECES.st;
+  const out=st.pat.reduce((s,a)=>s+ACT[a].out,0), inn=st.pat.reduce((s,a)=>s+ACT[a].inn,0);
+  const math=st.pat.length>1?`<div class="math">One recipe makes <span class="eq">${st.pat.map(a=>`${ACT[a].ab}(${ACT[a].out})`).join(' + ')} = ${out}</span> stitches.<br>${out} × ${st.times} = <b>${out*st.times}</b> stitches. That's the number in blue!</div>`
+    :`<div class="math">Each ${ACT[st.pat[0]].ab} makes ${ACT[st.pat[0]].out} stitch${ACT[st.pat[0]].out>1?'es':''}. ${ACT[st.pat[0]].out} × ${st.times} = <b>${st.total}</b>.</div>`;
+  $('#dec-left').innerHTML=`<div><div class="eyebrow">How to read one line</div><h2>Tap each coloured part</h2></div>
+    <div class="picker" role="group" aria-label="Pick a line from Edwin's pattern">${SAMPLES.map((s,k)=>`<button data-s="${k}" aria-pressed="${s===st}">rnd ${s.n}</button>`).join('')}</div>
+    <div class="bigcode">${pieces.map(([k,t])=>`<button data-piece="${k}" aria-pressed="${k===decPart}" style="background:${PIECES[k].c}">${t}</button>`).join('')}</div>
+    <div class="explain" style="border-left-color:${P.c}"><b class="h">${P.h}</b>${decPart==='rnd'?P.t(st.n):P.t(st)}</div>${math}
+    <p style="color:var(--muted)">These colours match page 3 of the booklet. Edwin's lines all work the same way.</p>`;
+  const L=st.pat.length, G=st.times;
+  let rows='';
+  if(L>1){for(let g=0;g<G;g++){rows+=`<div class="grp"><span class="gn">repeat ${g+1}</span>${st.pat.map((a,j)=>{const idx=g*L+j;return `<span class="tok ${idx<decPg?'done':(idx===decPg?'on':'')}">${ACT[a].ab}</span>`}).join('')}</div>`}}
+  else{rows=`<div class="grp" style="gap:4px">${st.actions.map((a,idx)=>`<span class="tok ${idx<decPg?'done':(idx===decPg?'on':'')}" style="padding:2px 5px;font-size:13px">${ACT[a].ab}</span>`).join('')}</div>`}
+  const r=ringSVG(st,decPg);
+  $('#dec-right').innerHTML=`<div><div class="eyebrow">Unroll it</div><h2>Watch round ${st.n} happen</h2></div>
+    <div class="tracker">${r.svg}</div>
+    <div class="ctrl"><button class="btn primary" data-d="play">${decTimer?ICON.pause+' Pause':ICON.play+' Play'}</button><button class="btn" data-d="reset">Start over</button><span class="tally">Stitches: <span class="n">${r.made}</span> / ${r.C}</span></div>
+    <div class="groups">${rows}</div>
+    <p style="color:var(--muted)">Grey dots in the middle are the stitches of the round before. Each new stitch is joined to the stitch it grows from: an increase makes a V, a decrease makes an upside-down V.</p>`;
+}
+$('#v-pattern').addEventListener('click',e=>{
+  const b=e.target.closest('[data-s],[data-piece],[data-d]');if(!b)return;
+  if(b.dataset.s!=null){decSt=SAMPLES[+b.dataset.s];decPg=0;stopDec()}
+  if(b.dataset.piece)decPart=b.dataset.piece;
+  if(b.dataset.d==='reset'){decPg=0;stopDec()}
+  if(b.dataset.d==='play'){if(decTimer)stopDec();else{if(decPg>=decSt.actions.length)decPg=0;decTimer=setInterval(()=>{decPg++;if(decPg>=decSt.actions.length)stopDec();renderDecoder()},decSt.actions.length>20?260:520)}}
+  renderDecoder();
+});
+function stopDec(){clearInterval(decTimer);decTimer=null}
+$('#gloss').innerHTML=[['rnd','round: one trip around'],['st / sts','stitch / stitches'],['MR','magic ring: how round pieces start'],['sc','single crochet'],['inc','increase: 2 sc in the same stitch'],['dec','decrease: join 2 stitches into 1'],['ch','chain'],['sl','slip stitch'],['[ ] x 7','do what\'s in the brackets 7 times'],['( )','how many stitches you should have'],['flo','front loop only (used in the decrease)'],['tail','the loose end of yarn you leave for sewing']].map(([a,b])=>`<div><b>${a}</b><span>${b}</span></div>`).join('');
+
+/* ---------- KIT ---------- */
+function renderKit(){
+  const mats=[['Green yarn','For the body and the eye edges',Y.g],['White yarn','For the belly and the middle of the eyes',Y.w],['Pink yarn','For the two blush cheeks',Y.p],['3.5 mm hook','The metal hook with the yellow handle',null],['Needles','Metal and plastic, for sewing pieces on',null],['Safety eyes','The 2 black eyes (glued on)',null],['Stuffing','To fill Edwin\'s body',null],['3 markers','Clip one into the first stitch of each round',null]];
+  const mk=(svg,t)=>`<div>${svg}${t}</div>`;
+  $('#kit').innerHTML=`
+  <div class="card panel"><h2>In the box</h2><div class="mat">${mats.map(([n,t,c])=>`<div>${c?`<span class="sw" style="background:${c}"></span>`:''}<b>${n}</b><span>${t}</span></div>`).join('')}</div></div>
+  <div class="card panel"><h2>What you'll make</h2><p>Six small pieces, then you sew them together.</p><div class="makes">
+    ${mk(frogSVG({done:23,eyes:false,belly:false,blush:false}),'1 body')}
+    ${mk(discSVG([{r:42,c:'w'},{r:84,c:'g'}],2,'<circle r="22" style="fill:#151515"/>'),'2 eyes')}
+    ${mk(discSVG([{r:24,c:'w'},{r:48,c:'w'},{r:70,c:'w'},{r:86,c:'w'}],4),'1 belly')}
+    ${mk(`<svg viewBox="-100 -60 200 120"><ellipse rx="44" ry="26" style="fill:${Y.p};stroke:var(--outline)"/></svg>`,'2 blush')}
+  </div><p style="color:var(--muted)">Edwin is about the size of a big egg when he's done.</p></div>
+  <div class="card panel"><h2>Good to know</h2><ul class="tips">
+    <li>Round 1 of the body is already done. It's in the middle of the green ball.</li>
+    <li>Edwin goes round and round in a spiral. You don't need to join rounds. Use a marker to see where each round starts.</li>
+    <li>Count your stitches at the end of each round. The number in blue brackets tells you how many.</li>
+    <li>Made a mistake? Pull the yarn gently to undo stitches back to the mistake, then carry on. Everyone does this.</li>
+    <li>Keep your stitches relaxed. If the hook is hard to push in, you're pulling too tight.</li>
+    <li>The eyes are stuck on with hot glue. Ask a grown-up for that step.</li>
+  </ul></div>
+  <div class="card panel"><h2>CrochetBox videos</h2><p>Real hands doing each stitch. The video for Edwin is in "Learn crochet kits" on their site. The password is on page 2 of your booklet.</p><div class="links">
+    <a class="btn" href="https://crochetbox.net/pages/crochet-101" target="_blank" rel="noopener">${ICON.ext} Crochet 101 (all the basics)</a>
+    <a class="btn" href="https://crochetbox.net/pages/learn-crochet-kits" target="_blank" rel="noopener">${ICON.ext} Learn crochet kits</a>
+    <a class="btn" href="${LINK(VID.hold)}" target="_blank" rel="noopener">${ICON.ext} How to hold the hook and yarn</a>
+  </div><p style="color:var(--muted);font-size:15px">Stuck? CrochetBox help: hello@crochetbox.net</p>
+  <button class="btn" id="reset" style="align-self:flex-start">Start Edwin over (clears progress)</button><p id="reset-msg" hidden style="font-weight:700"></p></div>`;
+  let armed=false;
+  $('#reset').addEventListener('click',()=>{const m=$('#reset-msg');if(!armed){armed=true;m.hidden=false;m.textContent='Tap again to clear all your ticks.';return}
+    S={p:{},part:'body',cur:{}};save();armed=false;m.textContent='Cleared. Fresh start!';renderMake()});
+}
+
+/* ---------- tabs ---------- */
+const VIEWS=['make','stitches','pattern','kit'];
+function go(v){if(!VIEWS.includes(v))v='make';
+  VIEWS.forEach(x=>{$('#v-'+x).hidden=x!==v});
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.v===v));
+  if(v!=='stitches'&&schoolPlayer){schoolPlayer.stop()}
+  if(v==='stitches')renderSchool();
+  if(v!=='pattern')stopDec();
+  if(v==='pattern')renderDecoder();
+  try{history.replaceState(null,'','#'+v)}catch(e){}
+}
+document.querySelector('nav.tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b)go(b.dataset.v)});
+window.addEventListener('hashchange',()=>go(location.hash.slice(1)));
+renderMake();renderKit();
+go(location.hash.slice(1)||'make');
+})();
+</script>
+
+</body>
+</html>
